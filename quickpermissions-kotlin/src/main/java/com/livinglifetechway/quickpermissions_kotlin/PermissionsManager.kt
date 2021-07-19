@@ -1,8 +1,8 @@
 package com.livinglifetechway.quickpermissions_kotlin
 
 import android.content.Context
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import com.livinglifetechway.quickpermissions_kotlin.util.PermissionCheckerFragment
 import com.livinglifetechway.quickpermissions_kotlin.util.PermissionsUtil
@@ -16,9 +16,9 @@ private const val TAG = "runWithPermissions"
  * defined in the annotation
  */
 fun <T> Context?.runWithPermissions(
-        vararg permissions: String,
-        options: QuickPermissionsOptions = QuickPermissionsOptions(),
-        callback: () -> T
+    vararg permissions: String,
+    options: QuickPermissionsOptions = QuickPermissionsOptions(),
+    callback: () -> T
 ): T {
     return runWithPermissionsHandler(this, permissions, callback, options)
 }
@@ -28,14 +28,19 @@ fun <T> Context?.runWithPermissions(
  * defined in the annotation
  */
 fun <T> Fragment?.runWithPermissions(
-        vararg permissions: String,
-        options: QuickPermissionsOptions = QuickPermissionsOptions(),
-        callback: () -> T
+    vararg permissions: String,
+    options: QuickPermissionsOptions = QuickPermissionsOptions(),
+    callback: () -> T
 ): T {
     return runWithPermissionsHandler(this, permissions, callback, options)
 }
 
-private fun <T> runWithPermissionsHandler(target: Any?, permissions: Array<out String>, callback: () -> T, options: QuickPermissionsOptions): T {
+private fun <T> runWithPermissionsHandler(
+    target: Any?,
+    permissions: Array<out String>,
+    callback: () -> T,
+    options: QuickPermissionsOptions
+): T {
     Log.d(TAG, "runWithPermissions: start")
 
     // get the permissions defined in annotation
@@ -53,7 +58,10 @@ private fun <T> runWithPermissionsHandler(target: Any?, permissions: Array<out S
 
         // check if we have the permissions
         if (PermissionsUtil.hasSelfPermission(context, arrayOf(*permissions))) {
-            Log.d(TAG, "runWithPermissions: already has required permissions. Proceed with the execution.")
+            Log.d(
+                TAG,
+                "runWithPermissions: already has required permissions. Proceed with the execution."
+            )
             return callback()
         } else {
             // we don't have required permissions
@@ -65,11 +73,15 @@ private fun <T> runWithPermissionsHandler(target: Any?, permissions: Array<out S
 
             // support for AppCompatActivity and Activity
             var permissionCheckerFragment = when (context) {
-            // for app compat activity
-                is AppCompatActivity -> context.supportFragmentManager?.findFragmentByTag(PermissionCheckerFragment::class.java.canonicalName) as PermissionCheckerFragment?
-            // for support fragment
-                is Fragment -> context.childFragmentManager.findFragmentByTag(PermissionCheckerFragment::class.java.canonicalName) as PermissionCheckerFragment?
-            // else return null
+                // for app compat activity
+                is AppCompatActivity -> context.supportFragmentManager?.findFragmentByTag(
+                    PermissionCheckerFragment::class.java.canonicalName
+                ) as PermissionCheckerFragment?
+                // for support fragment
+                is Fragment -> context.childFragmentManager.findFragmentByTag(
+                    PermissionCheckerFragment::class.java.canonicalName
+                ) as PermissionCheckerFragment?
+                // else return null
                 else -> null
             }
 
@@ -81,16 +93,22 @@ private fun <T> runWithPermissionsHandler(target: Any?, permissions: Array<out S
                 when (context) {
                     is AppCompatActivity -> {
                         context.supportFragmentManager.beginTransaction().apply {
-                            add(permissionCheckerFragment, PermissionCheckerFragment::class.java.canonicalName)
+                            add(
+                                permissionCheckerFragment,
+                                PermissionCheckerFragment::class.java.canonicalName
+                            )
                             commit()
                         }
                         // make sure fragment is added before we do any context based operations
-                        context.supportFragmentManager?.executePendingTransactions()
+                        context.supportFragmentManager.executePendingTransactions()
                     }
                     is Fragment -> {
                         // this does not work at the moment
                         context.childFragmentManager.beginTransaction().apply {
-                            add(permissionCheckerFragment, PermissionCheckerFragment::class.java.canonicalName)
+                            add(
+                                permissionCheckerFragment,
+                                PermissionCheckerFragment::class.java.canonicalName
+                            )
                             commit()
                         }
                         // make sure fragment is added before we do any context based operations
@@ -101,7 +119,8 @@ private fun <T> runWithPermissionsHandler(target: Any?, permissions: Array<out S
 
             // set callback to permission checker fragment
             var result: T? = null
-            permissionCheckerFragment.setListener(object : PermissionCheckerFragment.QuickPermissionsCallback {
+            permissionCheckerFragment.setListener(object :
+                PermissionCheckerFragment.QuickPermissionsCallback {
                 override fun onPermissionsGranted(quickPermissionsRequest: QuickPermissionsRequest?) {
                     Log.d(TAG, "runWithPermissions: got permissions")
                     try {
@@ -125,17 +144,19 @@ private fun <T> runWithPermissionsHandler(target: Any?, permissions: Array<out S
             })
 
             // create permission request instance
-            val permissionRequest = QuickPermissionsRequest(permissionCheckerFragment, arrayOf(*permissions))
+            val permissionRequest =
+                QuickPermissionsRequest(permissionCheckerFragment, arrayOf(*permissions))
             permissionRequest.handleRationale = options.handleRationale
             permissionRequest.handlePermanentlyDenied = options.handlePermanentlyDenied
             permissionRequest.rationaleMessage = if (options.rationaleMessage.isBlank())
                 "These permissions are required to perform this feature. Please allow us to use this feature. "
             else
                 options.rationaleMessage
-            permissionRequest.permanentlyDeniedMessage = if (options.permanentlyDeniedMessage.isBlank())
-                "Some permissions are permanently denied which are required to perform this operation. Please open app settings to grant these permissions."
-            else
-                options.permanentlyDeniedMessage
+            permissionRequest.permanentlyDeniedMessage =
+                if (options.permanentlyDeniedMessage.isBlank())
+                    "Some permissions are permanently denied which are required to perform this operation. Please open app settings to grant these permissions."
+                else
+                    options.permanentlyDeniedMessage
             permissionRequest.rationaleMethod = options.rationaleMethod
             permissionRequest.permanentDeniedMethod = options.permanentDeniedMethod
             permissionRequest.permissionsDeniedMethod = options.permissionsDeniedMethod
