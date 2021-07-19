@@ -1,4 +1,4 @@
-# QuickPermissions-Kotlin [![Release](https://jitpack.io/v/QuickPermissions/QuickPermissions-Kotlin.svg)](https://jitpack.io/#QuickPermissions/QuickPermissions-Kotlin)
+# QuickPermissions-Kotlin [![Release](https://jitpack.io/v/RazibKani/QuickPermissions-Kotlin.svg)](https://jitpack.io/#RazibKani/QuickPermissions-Kotlin)
 
 The most easiest way to handle Android Runtime Permissions in Kotlin.
 
@@ -49,7 +49,7 @@ In your **app**'s `build.gradle` file, add the following dependency:
 
 ```
 dependencies {
-   implementation 'com.github.quickpermissions:quickpermissions-kotlin:0.4.0'
+   implementation 'com.github.RazibKani:QuickPermissions-Kotlin:0.4.4'
 }
 ```
 
